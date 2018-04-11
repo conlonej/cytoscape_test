@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="cytoscape.js"></script>
+</head>
+<body>
+    <style>
+        #cy {
+            /*changed size to leave room for toolbar*/
+            width: 100%;
+            height: 80%;
+            position: absolute;
+            background: #f4f8ff;
+            top: 50px;
+            left: 0px;
+        }
+    </style>
+
+    <div id="cy"></div>
+
+    <script>
+        var cy = cytoscape({
+            container: document.getElementById('cy'),
+            style: [
+            {
+                //style for nodes
+                selector: 'node',
+                style: {
+                    shape: 'rectangle',
+                    "text-valign": "center",
+                    "text-halign": "center",
+                    label: 'data(label)',
+                    width: 'data(width)'
+                },
+                selector: 'edge',
+                style: {
+                    'curve-style': 'bezier',
+                    'target-arrow-shape': 'triangle',
+                    label: 'data(label)',
+                    //maybe more
+                }
+            }],
+            elements: [
+                { data: { id: 'a' } },
+                { data: { id: 'b' } },
+                { data: { id: 'c'} },
+                {
+                    data: {
+                        id: 'ab',
+                        source: 'a',
+                        target: 'b'
+                    }
+                }]
+        });
+
+
+        //The global node ID and global edge ID might be useful later
+
+
+        /***************************/
+        /***** ID Book-keeping *****/
+        /***************************/
+        // used to ensure no ID collision occurs when using undoStack/redoStack
+
+        // increment functions are called whenever a node/edge is created, so
+        // there is never a collision between a deleted item on the undo stack
+        // and an item created later on (e.g. whenever you create a node it is
+        // always a higher ID than any other node that has been created so far)
+
+        /*var globalNodeID = "";
+        var globalEdgeID = "";
+
+        function incrementNodeID() {
+            var num = parseInt(globalNodeID.substring(1));
+            num++;
+            globalNodeID = "n" + num.toString();
+        }
+
+        function incrementEdgeID() {
+            var num = parseInt(globalEdgeID.substring(1));
+            num++;
+            globalEdgeID = "e" + num.toString();
+        }*/
+
+
+        cy.add({
+            data: { id: 'node' }
+        })
+    </script>
+</body>
+</html>
