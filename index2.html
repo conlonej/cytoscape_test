@@ -37,27 +37,31 @@
         var cy = cytoscape({
             container: document.getElementById('cy'),
             style: [
-            {
-                //style for nodes
+            {       // styling for nodes
                 selector: 'node',
                 style: {
-                    shape: 'rectangle',
-                    "text-valign": "center",
-                    "text-halign": "center",
-                    label: 'data(label)',
-                    width: 'data(width)'
-                },
+                    'shape': 'rectangle',
+                    "text-valign" : "center",
+                    "text-halign" : "center",
+                    'label': 'data(label)',
+                    //'padding': 5,
+                    'width': 'data(width)'
+                    //'padding': 10px
+                }
+            },
+            {       // styling for edges
                 selector: 'edge',
                 style: {
                     'curve-style': 'bezier',
                     'target-arrow-shape': 'triangle',
-                    label: 'data(label)',
+                    'label': 'data(label)',
                     'text-outline-width': 2.5,
                     "text-outline-color": "#f4f8ff"
                 }
             }],
+
             elements: [
-                { data: { id: 'a' } },
+                /*{ data: { id: 'a' } },
                 { data: { id: 'b' } },
                 { data: { id: 'c'} },
                 {
@@ -66,8 +70,9 @@
                         source: 'a',
                         target: 'b'
                     }
-                }]
+                }*/]
         });
+
 
 
         /**************************/
@@ -94,7 +99,7 @@
             }
         }
 
-        
+
 
         //$(function () {
             $('#toolbar').w2toolbar({
@@ -165,9 +170,9 @@
         }*/
 
 
-        cy.add({
-            data: { id: 'node' }
-        })
+        //cy.add({
+        //    data: { id: 'node' }
+        //})
 
 
 
