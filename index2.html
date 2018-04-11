@@ -52,7 +52,8 @@
                     'curve-style': 'bezier',
                     'target-arrow-shape': 'triangle',
                     label: 'data(label)',
-                    //maybe more
+                    'text-outline-width': 2.5,
+                    "text-outline-color": "#f4f8ff"
                 }
             }],
             elements: [
@@ -89,8 +90,6 @@
         var items = tb['items'];
 
 
-        //The global node ID and global edge ID might be useful later
-
 
         /***************************/
         /***** ID Book-keeping *****/
@@ -102,19 +101,40 @@
         // and an item created later on (e.g. whenever you create a node it is
         // always a higher ID than any other node that has been created so far)
 
-        /*var globalNodeID = "";
-        var globalEdgeID = "";
+        var globalNodeID = "n0";
+        var globalEdgeID = "e0";
 
         function incrementNodeID() {
-            var num = parseInt(globalNodeID.substring(1));
+            var num = parseInt(globalNodeID.substring(1), 10);
             num++;
             globalNodeID = "n" + num.toString();
         }
 
         function incrementEdgeID() {
-            var num = parseInt(globalEdgeID.substring(1));
+            var num = parseInt(globalEdgeID.substring(1), 10);
             num++;
             globalEdgeID = "e" + num.toString();
+        }
+
+        /*var globalNodeID = 1//"";
+        var globalEdgeID = 1//"";
+
+        function incrementNodeID() {
+            var num = globalNodeID;
+            num++;
+            globalNodeID = num;
+            //var num = parseInt(globalNodeID.substring(1));
+            //num++;
+            //globalNodeID = "n" + num.toString();
+        }
+
+        function incrementEdgeID() {
+            var num = globalEdgeID;
+            num++;
+            globalEdgeID = num;
+            //var num = parseInt(globalEdgeID.substring(1));
+            //num++;
+            //globalEdgeID = "e" + num.toString();
         }*/
 
 
@@ -269,16 +289,16 @@
 
         /***** ADD NODE *****/
         function addNode(posX, posY) {
-            //incrementNodeID();
+            incrementNodeID();
 
             cy.add({
                 group: "nodes",
-                data: { id: 100, label: "", width: 60 },
-                //data: { id: globalNodeID, label: "", width: 60 },
+                //data: { id: 100, label: "", width: 60 },
+                data: { id: globalNodeID, label: "", width: 60 },
                 renderedPosition: { x: posX, y: posY }
             });
-            //var node = cy.getElementById(globalNodeID);
-            var node = cy.getElementById(100);
+            var node = cy.getElementById(globalNodeID);
+            //var node = cy.getElementById(100);
 
             // UNDO INFO
             //lastEvent = { type: "addNode", target: node, time: getTimeStamp() };
@@ -295,14 +315,14 @@
 
         /***** ADD EDGE *****/
         function addEdge(src, dst) {
-            //incrementEdgeID();
+            incrementEdgeID();
             cy.add({
                 group: "edges",
-                data: { id: 50, source: src, target: dst, label: "" }
-                //data: { id: globalEdgeID, source: src, target: dst, label: "" }
+                //data: { id: 50, source: src, target: dst, label: "" }
+                data: { id: globalEdgeID, source: src, target: dst, label: "" }
             });
-            //var edge = cy.getElementById(globalEdgeID);
-            var edge = cy.getElementById(50);
+            var edge = cy.getElementById(globalEdgeID);
+            //var edge = cy.getElementById(50);
 
             // UNDO INFO
             //lastEvent = { type: "addEdge", target : edge, time: getTimeStamp() };
