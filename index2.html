@@ -68,7 +68,7 @@
                 }]
         });
 
-        $(function () {
+        //$(function () {
             $('#toolbar').w2toolbar({
                 name: 'toolbar',
                 items: [
@@ -76,13 +76,17 @@
                     { type: 'button', id: 'addEdge', text: 'Add Edge' },
                     { type: 'break' },
                     { type: 'button', id: 'editLabel', text: 'Edit Label' },
-                    { type: 'button', id: 'delete', text: 'Delete' }
+                    { type: 'button', id: 'delete', text: 'Delete' },
+                    { type: 'button', id: 'save', text: 'Save'}
                 ],
-                onClick: function (event) {
-                    console.log('Target: '+ event.target, event);
-                }
+                //onClick: function (event) {
+                //    console.log('Target: '+ event.target, event);
+                //}
             });
-        });
+        //});
+
+        var tb = w2ui['toolbar'];
+        var items = tb['items'];
 
 
         //The global node ID and global edge ID might be useful later
@@ -117,6 +121,255 @@
         cy.add({
             data: { id: 'node' }
         })
+
+
+
+
+        /****************************************************/
+        /***** HANDLE GRAY-OUT OF EDIT LABEL AND DELETE *****/
+        /****************************************************/
+        cy.on("select", toolbarSelectHandler);
+        cy.on("unselect", toolbarUnselectHandler)
+
+        function toolbarSelectHandler(event) {
+            tb.enable("editLabel");
+            tb.enable("delete");
+        }
+
+        function toolbarUnselectHandler(event) {
+            tb.disable("editLabel");
+            tb.disable("delete");
+        }
+
+
+
+
+
+        /**********************************/
+        /***** TOOLBAR EVENT HANDLERS *****/
+        /**********************************/
+        function addNode_Listener(event) {
+            // if the click was on the canvas, add node at the click position
+            if (!(event.target.length > 0)) {
+                addNode(event.renderedPosition.x, event.renderedPosition.y);
+            }
+        }
+
+        var source;
+        var dest;
+        function addEdge_Listener(event) {
+            if (source == "") { // if there isn't a source node yet
+                source = this.id();
+            }
+            else { // else there is already a source node
+                dest = this.id();
+                addEdge(source, dest);
+
+                source = "";
+                dest = "";
+            }
+        }
+
+        function editLabel_Handler() {
+            // ensuring only one element is selected
+            var selectedElems = cy.$(':selected');
+            if (selectedElems.length == 1) {
+                editLabel(selectedElems[0]);
+            }
+            else if (selectedElems.length > 1) { alert("You can only edit one label at a time!"); }
+        }
+
+        // used for editing labels with double click
+        function editLabel_ListenerDBL(event) {
+            var targ = event.target;
+            editLabel(targ);
+        }
+
+
+        /***************************/
+        /***** TOOLBAR ONCLICK *****/
+        /***************************/
+        // Handles clicking buttons on the toolbar
+        w2ui.toolbar.on('click', function(event) {
+            var targ = tb.get(event.target); // get the clicked button
+
+            // Any time a button is clicked, turn off any listeners that may have
+            // previously been created
+            cy.off('click', addNode_Listener);
+            cy.off('click', 'node', addEdge_Listener);
+
+            // making sure only one button can be checked at a time
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].id != event.target) { tb.uncheck(items[i].id); }
+            }
+
+            if (targ.checked != true) {
+                switch (event.target) {
+                    case ("addNode"): // Add Node
+                        var selectedElements = cy.$('node:selected, edge:selected');
+                        selectedElements.unselect();
+
+                        cy.on('click', addNode_Listener);
+                        break;
+                    case ("addEdge"): // Add Edge
+                        var selectedElements = cy.$('node:selected, edge:selected');
+                        selectedElements.unselect();
+
+                        source = "";
+                        dest = "";
+
+                        cy.on('click', 'node', addEdge_Listener);
+                        break;
+                    case ("editLabel"): // Edit Label
+                        editLabel_Handler();
+                        break;
+                    case ("delete"): // Delete Selected
+                        deleteSelected();
+                        break;
+                    //case ("undo"): // Undo
+                    //    undo();
+                    //    break;
+                    //case ("redo"): // Redo
+                    //    redo();
+                    //    break;
+                    case ("save"): // Save
+                        //TODO: Save the graph
+
+                        //saveGraph();
+                        break;
+                    //case ("fit"): // Fit
+                    //    cy.fit(cy.$('node'), 100);
+                    //    break;
+                    //case ("item9"): // Print Undo stack
+                    //    for (var i = 0; i < undoStack.length; i++) {
+                    //        console.log(undoStack[i]);
+                    //    }
+                    //    break;
+                }
+            }
+            else { // if unchecking an item
+                switch (event.target) {
+                    case ("addNode"): // Add Node
+                        cy.off('click', addNode_Listener);
+                        break;
+                    case ("addEdge"): // Add Edge
+                        cy.off('click', 'node', addEdge_Listener);
+                        break;
+                }
+            }
+        });
+
+
+
+
+
+
+
+
+        /***** ADD NODE *****/
+        function addNode(posX, posY) {
+            //incrementNodeID();
+
+            cy.add({
+                group: "nodes",
+                data: { id: 100, label: "", width: 60 },
+                //data: { id: globalNodeID, label: "", width: 60 },
+                renderedPosition: { x: posX, y: posY }
+            });
+            //var node = cy.getElementById(globalNodeID);
+            var node = cy.getElementById(100);
+
+            // UNDO INFO
+            //lastEvent = { type: "addNode", target: node, time: getTimeStamp() };
+            //undoStack.push(lastEvent);
+            //tb.enable("undo"); // enable "undo" button on toolbar
+
+            // EMPTY REDO STACK
+            //redoStack = [];
+            //tb.disable("redo"); // disable "redo" button on toolbar
+
+            // HANDLE DIRTY BIT
+            //setDirty();
+        }
+
+        /***** ADD EDGE *****/
+        function addEdge(src, dst) {
+            //incrementEdgeID();
+            cy.add({
+                group: "edges",
+                data: { id: 50, source: src, target: dst, label: "" }
+                //data: { id: globalEdgeID, source: src, target: dst, label: "" }
+            });
+            //var edge = cy.getElementById(globalEdgeID);
+            var edge = cy.getElementById(50);
+
+            // UNDO INFO
+            //lastEvent = { type: "addEdge", target : edge, time: getTimeStamp() };
+            //undoStack.push(lastEvent);
+            //tb.enable("undo"); // enable "undo" button on toolbar
+
+            // EMPTY REDO STACK
+            //redoStack = [];
+            //tb.disable("redo"); // disable "redo" button on toolbar
+
+            // HANDLE DIRTY BIT
+            //setDirty();
+        }
+
+        /***** EDIT LABEL *****/
+        function editLabel(target) {
+            oldLabel = target.data('label');
+            var newLabel = prompt("Enter new label", target.data('label'));
+
+            // Checking if prompt was cancelled or new label is same as old label
+            if (newLabel === null || newLabel === false || newLabel == oldLabel) { // If cancelled
+                return;
+            }
+            else { // If not cancelled
+                handleWidth(target, newLabel);
+                target.json({ data: { label: newLabel } });
+
+                // UNDO INFO
+                //lastEvent = { type: "editLabel", target: target, time: getTimeStamp(), oldLabel: oldLabel };
+                //undoStack.push(lastEvent);
+                //tb.enable("undo"); // enable "undo" button on toolbar
+
+                // EMPTY REDO STACK
+                //redoStack = [];
+                //tb.disable("redo"); // disable "redo" button on toolbar
+
+                // HANDLE DIRTY BIT
+                //setDirty();
+            }
+        }
+
+        /***** DELETE SELECTED *****/
+        function deleteSelected() {
+            // Get selected nodes and select their connected edges
+            var selectedNodes = cy.$('node:selected');
+            var connectedEdges = selectedNodes.connectedEdges();
+            connectedEdges.select();
+
+            // Get and remove all selected elements
+            var selectedElements = cy.$('node:selected, edge:selected');
+            selectedElements.unselect();
+            cy.remove(selectedElements);
+
+            // UNDO INFO
+            //lastEvent = { type: "deleteSelected", target: selectedElements, time: getTimeStamp() };
+            //undoStack.push(lastEvent);
+            //tb.enable("undo"); // enable "undo" button on toolbar
+
+            // EMPTY REDO STACK
+            //redoStack = [];
+            //tb.disable("redo"); // disable "redo" button on toolbar
+
+            // HANDLE DIRTY BIT
+            //setDirty();
+        }
+
+
+
     </script>
 </body>
 </html>
