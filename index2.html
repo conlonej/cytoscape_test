@@ -69,6 +69,33 @@
                 }]
         });
 
+
+        /**************************/
+        /***** GET TEXT WIDTH *****/
+        /**************************/
+        // returns the width of inputted text
+        function getTextWidth(text, font) {
+            // re-use canvas object for better performance
+            var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+            var context = canvas.getContext("2d");
+            context.font = font;
+            var metrics = context.measureText(text);
+            return metrics.width;
+        }
+
+        // uses getTextWidth() to set a node's width based on its label
+        function handleWidth(target, label) {
+            var width = getTextWidth(label, 'normal 16px helvetica');
+            if ((width + 20) < 50) {
+                target.data('width', 60);
+            }
+            else {
+                target.data('width', width + 20);
+            }
+        }
+
+        
+
         //$(function () {
             $('#toolbar').w2toolbar({
                 name: 'toolbar',
